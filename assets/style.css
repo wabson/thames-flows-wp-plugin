@@ -1,0 +1,99 @@
+.bar {
+  fill: steelblue;
+}
+.bar:hover {
+  fill: skyblue;
+}
+.axis {
+  font: 10px sans-serif;
+}
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+.x.axis path {
+  display: none;
+}
+line.rule {
+  stroke: #ccc;
+}
+.weekday {
+   fill: none;
+   stroke: #e0e0e0;
+}
+rect.weekend {
+   fill: #f0f0f0;
+}
+rect.noshow {
+   fill: transparent;
+}
+.line {
+  fill: none;
+  stroke: #2F5168;
+  stroke-width: 2px;
+}
+.area {
+  fill: #5696BC;
+  fill-opacity: 0.6;
+}
+.point {
+  fill: transparent;
+  stroke: none;
+}
+.point:hover {
+  stroke: #2F5168;
+  stroke-width: 2px;
+}
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+body {
+   font-family: Helvetica, Arial, sans-serif;
+   font-size: 80%;
+}
+.ui-widget {
+   font-family: Helvetica, Arial, sans-serif;
+}
+.flow-graph input[type="text"] {
+   display: inline;
+   margin-bottom: 0px;
+   width: 100px;
+}
+.flow-graph table {
+    border-collapse: collapse;
+}
+.flow-graph table td, .flow-graph table th {
+    border: 1px solid #ccc;
+    padding: 2px;
+}
+.flow-graph svg {
+    border: 1px solid #ccc;
+}
+/*.graph table {
+    display: none;
+}*/
