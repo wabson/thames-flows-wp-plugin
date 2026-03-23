@@ -1,13 +1,15 @@
+var svgMinWidth = 300;
+var svgMaxHeight = 300;
+var numDays = 7;
+
 var margin = {top: 30, right: 20, bottom: 30, left: 40},
-    width = 940 - margin.left - margin.right,
-    height = 300 - margin.top - margin.bottom,
     spaceAboveRatio = 0.1;
 
 var barWidth = 0;
 
 var dateFormat = d3.time.format("%d %b %y %H:%M");
 
-var day = 24*60*60*1000, month = day * 30, now = new Date(Date.now()), then = new Date(now.getTime() - month);
+var day = 24*60*60*1000, rangePeriod = day * numDays, now = new Date(Date.now()), then = new Date(now.getTime() - rangePeriod);
 
 var stationNames = {
     'kingston': 'Kingston',
@@ -17,6 +19,19 @@ var stationNames = {
 }
 
 function plotGraph(htmlid) {
+    if (document.readyState === "loading") {
+        addEventListener('DOMContentLoaded', function(event) {
+            _plotGraph(htmlid);
+        });
+    } else {
+        _plotGraph(htmlid);
+    }
+}
+function _plotGraph(htmlid) {
+    var graphEl = document.getElementById(htmlid), parentEl = graphEl.parentNode.parentNode;
+    var svgWidth = Math.max(parentEl.clientWidth, svgMinWidth), svgHeight = Math.min(window.innerWidth, svgMaxHeight);
+    var width = svgWidth - margin.left - margin.right,
+        height = svgHeight - margin.top - margin.bottom;
     then.setHours(0, 0, 0, 0);
     //now.setHours(0, 0, 0, 0);
     var x = d3.time.scale().nice()
@@ -72,8 +87,8 @@ function plotGraph(htmlid) {
 
     svg.call(tip);
 
-    var parseDateTime = d3.time.format("%Y-%m-%d %H:%M:%S").parse,
-        toDate = function(d) { return d3.time.format("%Y-%m-%d").parse(d3.time.format("%Y-%m-%d")(d)); };
+    var parseDateTime = d3.time.format.utc("%Y-%m-%d %H:%M:%S").parse,
+        toDate = function(d) { return d3.time.format.utc("%Y-%m-%d").parse(d3.time.format.utc("%Y-%m-%d")(d)); };
 
     var data,
         query = "select measured_at, value from flowrate where station_name=\"" + stationNames[htmlid] + "\"";
@@ -90,6 +105,7 @@ function plotGraph(htmlid) {
 
         if (json) {
             data = json.data;
+            console.log(json);
             data.forEach(function(d) {
                 d.value = +d.value;
                 d["measured_at"] = parseDateTime(d["measured_at"]);
@@ -217,6 +233,15 @@ function plotGraph(htmlid) {
             .data(data)
             .enter().append("tr")
             .html(function(d) { return "<td>" + dateFormat(d.measured_at) + "</td><td>" + d.value + "</td>"; });
+        var statusEl = document.getElementById('lastFlowDiv') || document.createElement("p");
+        statusEl.id = 'lastFlowDiv';
+        var lastValue = data.length ? data[data.length - 1] : null;
+        if (lastValue) {
+            var formattedValue = Math.round(lastValue.value * 10) / 10;
+            var formattedDate = new Intl.DateTimeFormat(undefined, {dateStyle: 'medium', timeStyle: 'short'}).format(lastValue.measured_at);
+            statusEl.innerHTML = '<span style="font-size: 1.2em; font-weight: bold;"><span>Latest flow rate is ' + formattedValue + ' m3/sec</span><span style="padding-left: 5px; color: #999;">measured at ' + formattedDate + "</span></span>";
+            graphEl.prepend(statusEl);
+        }
     });
 };
 

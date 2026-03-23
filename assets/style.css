@@ -97,3 +97,14 @@ body {
 /*.graph table {
     display: none;
 }*/
+.graph-controls button {
+   font-family: Helvetica, Arial, sans-serif;
+   padding: 8px;
+   border-radius: 0;
+   border-bottom: 2px solid #e0e0e0;
+   border-right: 2px solid #e0e0e0;
+}
+.graph-controls input[type="text"] {
+   padding: 5px;
+   color: #55555;
+}
