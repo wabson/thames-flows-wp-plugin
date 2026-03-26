@@ -90,17 +90,17 @@ function _plotGraph(htmlid) {
     var parseDateTime = d3.time.format.utc("%Y-%m-%d %H:%M:%S").parse,
         toDate = function(d) { return d3.time.format.utc("%Y-%m-%d").parse(d3.time.format.utc("%Y-%m-%d")(d)); };
 
-    var data,
-        query = "select measured_at, value from flowrate where station_name=\"" + stationNames[htmlid] + "\"";
+    var data;
 
     var startDate = $("#" + htmlid + "-date-from").datepicker("getDate"), endDate = $("#" + htmlid + "-date-to").datepicker("getDate");
+    var apiUrl = "https://pubsm4kw3kv5thp2m6zsgfzlwi0tzxyh.lambda-url.eu-west-2.on.aws/?station_name=" + encodeURIComponent(stationNames[htmlid]);
     if (startDate !== null && endDate !== null) {
         // Add a day to the end date so that we get that day's data too
         endDate.setTime(endDate.getTime() + 24*60*60*1000);
-        query += " AND measured_at > \"" + d3.time.format("%Y-%m-%d")(startDate) + "\" AND measured_at < \"" + d3.time.format("%Y-%m-%d")(endDate) + "\"";
+        apiUrl += "&start=" + d3.time.format("%Y-%m-%d")(startDate) + "&end=" + d3.time.format("%Y-%m-%d")(endDate);
     }
 
-    d3.json("https://wabson.org/flowdata/sqlite.php?db=thames_flow&table=flowrate&query=" + encodeURIComponent(query), function(error, json) {
+    d3.json(apiUrl, function(error, json) {
         if (error) return console.warn(error);
 
         if (json) {
