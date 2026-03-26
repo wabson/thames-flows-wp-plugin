@@ -9,7 +9,7 @@
  * License: Apache
  */
 function markup($id, $stationName) {
-   return '<div class="graph flow-graph" id="'.$id.'">'.
+   return '<div class="graph flow-graph" id="'.$id.'" data-station-name="'.htmlspecialchars($stationName).'">'.
        //'<h2>'.$stationName.'</h2>'.
        '<p class="graph-controls"><input type="text" id="'.$id.'-date-from" class="date-picker" /> – <input type="text" id="'.$id.'-date-to" class="date-picker" /> <button type="button" id="'.$id.'-change-btn">Show</button></p>'.
        '<p id="'.$id.'-graph"></p>'.
@@ -19,12 +19,12 @@ function markup($id, $stationName) {
        '<script type="text/javascript">$("#'.$id.'-date-from").datepicker({ dateFormat: "dd/mm/yy" }); $("#'.$id.'-date-from").datepicker("setDate", then); $("#'.$id.'-date-to").datepicker({ dateFormat: "dd/mm/yy" }); $("#'.$id.'-date-to").datepicker("setDate", now); $("#'.$id.'-change-btn").on("click", function() { plotGraph(this.id.replace("-change-btn", ""))}); plotGraph("'.$id.'"); $("#'.$id.'-data-toggle a").on("click", function(evt) { evt.stopPropagation(); evt.preventDefault(); $("#" + this.parentNode.id.replace("-data-toggle", "-table")).toggle(); }); window.addEventListener("orientationchange", function() { plotGraph("'.$id.'"); }); if (screen && screen.orientation && screen.orientation.addEventListener) { screen.orientation.addEventListener("change", function(e) { plotGraph("'.$id.'"); });}</script>';
 }
 
-// [flow_graph id="kingston" station_name="Kingston Flow"]
+// [flow_graph station_name="Kingston"]
 function flow_graph( $atts ) {
     extract( shortcode_atts( array(
-        'id' => 'kingston',
-        'station_name' => 'Kingston Flow',
+        'station_name' => 'Kingston',
     ), $atts ) );
+    $id = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $station_name));
 
     $html = '<script src="//d3js.org/d3.v3.min.js"></script>'.
         '<script src="'.plugin_dir_url(__FILE__).'assets/d3-tip-0.9.1.js"></script>'.

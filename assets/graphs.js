@@ -1,3 +1,5 @@
+var apiBaseUrl = "https://pubsm4kw3kv5thp2m6zsgfzlwi0tzxyh.lambda-url.eu-west-2.on.aws/";
+
 var svgMinWidth = 300;
 var svgMaxHeight = 300;
 var numDays = 7;
@@ -11,12 +13,6 @@ var dateFormat = d3.time.format("%d %b %y %H:%M");
 
 var day = 24*60*60*1000, rangePeriod = day * numDays, now = new Date(Date.now()), then = new Date(now.getTime() - rangePeriod);
 
-var stationNames = {
-    'kingston': 'Kingston',
-    'walton': 'Walton',
-    'maidenhead': 'Maidenhead',
-    'reading': 'Reading'
-}
 
 function plotGraph(htmlid) {
     if (document.readyState === "loading") {
@@ -93,7 +89,8 @@ function _plotGraph(htmlid) {
     var data;
 
     var startDate = $("#" + htmlid + "-date-from").datepicker("getDate"), endDate = $("#" + htmlid + "-date-to").datepicker("getDate");
-    var apiUrl = "https://pubsm4kw3kv5thp2m6zsgfzlwi0tzxyh.lambda-url.eu-west-2.on.aws/?station_name=" + encodeURIComponent(stationNames[htmlid]);
+    var stationName = document.getElementById(htmlid).dataset.stationName;
+    var apiUrl = apiBaseUrl + "?station_name=" + encodeURIComponent(stationName);
     if (startDate !== null && endDate !== null) {
         // Add a day to the end date so that we get that day's data too
         endDate.setTime(endDate.getTime() + 24*60*60*1000);
