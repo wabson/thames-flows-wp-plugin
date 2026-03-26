@@ -73,7 +73,10 @@ function _plotGraph(htmlid) {
     const parseDateTime = d3.time.format.utc("%Y-%m-%d %H:%M:%S").parse,
         toDate = d => d3.time.format.utc("%Y-%m-%d").parse(d3.time.format.utc("%Y-%m-%d")(d));
 
-    const startDate = $(`#${htmlid}-date-from`).datepicker("getDate"), endDate = $(`#${htmlid}-date-to`).datepicker("getDate");
+    const startDateVal = document.getElementById(`${htmlid}-date-from`).value;
+    const endDateVal = document.getElementById(`${htmlid}-date-to`).value;
+    const startDate = startDateVal ? new Date(startDateVal) : null;
+    const endDate = endDateVal ? new Date(endDateVal) : null;
     const stationName = document.getElementById(htmlid).dataset.stationName;
     let apiUrl = `${apiBaseUrl}?station_name=${encodeURIComponent(stationName)}`;
     if (startDate !== null && endDate !== null) {

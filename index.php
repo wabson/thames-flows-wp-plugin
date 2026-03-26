@@ -11,12 +11,12 @@
 function markup($id, $stationName) {
    return '<div class="graph flow-graph" id="'.$id.'" data-station-name="'.htmlspecialchars($stationName).'">'.
        //'<h2>'.$stationName.'</h2>'.
-       '<p class="graph-controls"><input type="text" id="'.$id.'-date-from" class="date-picker" /> – <input type="text" id="'.$id.'-date-to" class="date-picker" /> <button type="button" id="'.$id.'-change-btn">Show</button></p>'.
+       '<p class="graph-controls"><input type="date" id="'.$id.'-date-from" /> – <input type="date" id="'.$id.'-date-to" /> <button type="button" id="'.$id.'-change-btn">Show</button></p>'.
        '<p id="'.$id.'-graph"></p>'.
        '<p id="'.$id.'-data-toggle"><a href="#">Show Data</a></p>'.
        '<p id="'.$id.'-table" class="table" style="display: none;"></p>'.
        '</div>'.
-       '<script type="text/javascript">$("#'.$id.'-date-from").datepicker({ dateFormat: "dd/mm/yy" }); $("#'.$id.'-date-from").datepicker("setDate", then); $("#'.$id.'-date-to").datepicker({ dateFormat: "dd/mm/yy" }); $("#'.$id.'-date-to").datepicker("setDate", now); $("#'.$id.'-change-btn").on("click", function() { plotGraph(this.id.replace("-change-btn", ""))}); plotGraph("'.$id.'"); $("#'.$id.'-data-toggle a").on("click", function(evt) { evt.stopPropagation(); evt.preventDefault(); $("#" + this.parentNode.id.replace("-data-toggle", "-table")).toggle(); }); window.addEventListener("orientationchange", function() { plotGraph("'.$id.'"); }); if (screen && screen.orientation && screen.orientation.addEventListener) { screen.orientation.addEventListener("change", function(e) { plotGraph("'.$id.'"); });}</script>';
+       '<script type="text/javascript">document.getElementById("'.$id.'-date-from").value = then.toISOString().split("T")[0]; document.getElementById("'.$id.'-date-to").value = now.toISOString().split("T")[0]; document.getElementById("'.$id.'-change-btn").addEventListener("click", function() { plotGraph(this.id.replace("-change-btn", ""))}); plotGraph("'.$id.'"); document.querySelector("#'.$id.'-data-toggle a").addEventListener("click", function(evt) { evt.stopPropagation(); evt.preventDefault(); var tableEl = document.getElementById(this.parentNode.id.replace("-data-toggle", "-table")); tableEl.style.display = tableEl.style.display === "none" ? "" : "none"; }); window.addEventListener("orientationchange", function() { plotGraph("'.$id.'"); }); if (screen && screen.orientation && screen.orientation.addEventListener) { screen.orientation.addEventListener("change", function(e) { plotGraph("'.$id.'"); });}</script>';
 }
 
 // [flow_graph station_name="Kingston"]
@@ -28,9 +28,7 @@ function flow_graph( $atts ) {
 
     $html = '<script src="//d3js.org/d3.v3.min.js"></script>'.
         '<script src="'.plugin_dir_url(__FILE__).'assets/d3-tip-0.9.1.js"></script>'.
-        '<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">'.
-        '<script src="//code.jquery.com/jquery-1.9.1.js"></script>'.
-        '<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>'.
+
         '<link rel="stylesheet" href="'.plugin_dir_url(__FILE__).'assets/style.css?v=2">'.
         '<script src="'.plugin_dir_url(__FILE__).'assets/graphs.js?v=4"></script>'.
         '<div class="graphs">'.
