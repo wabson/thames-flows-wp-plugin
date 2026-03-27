@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thames Flow Data</title>
+    <script src="//d3js.org/d3.v3.min.js"></script>
+    <script src="plugin/assets/d3-tip-0.9.1.js"></script>
+    <link rel="stylesheet" href="plugin/assets/style.css">
+    <script src="plugin/assets/graphs.js"></script>
+</head>
+<body>
+    <div class="graphs">
+        <div class="graph flow-graph" id="kingston" data-station-name="Kingston">
+            <p class="graph-controls">
+                <input type="date" id="kingston-date-from" /> –
+                <input type="date" id="kingston-date-to" />
+                <button type="button" id="kingston-change-btn">Show</button>
+            </p>
+            <p id="kingston-graph"></p>
+            <p id="kingston-data-toggle"><a href="#">Show Data</a></p>
+            <p id="kingston-table" class="table" style="display: none;"></p>
+        </div>
+    </div>
+    <script>initGraph("kingston");</script>
+</body>
+</html>

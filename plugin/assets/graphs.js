@@ -11,6 +11,25 @@ const dateFormat = d3.time.format("%d %b %y %H:%M");
 
 const day = 24*60*60*1000, rangePeriod = day * numDays, now = new Date(Date.now()), then = new Date(now.getTime() - rangePeriod);
 
+function initGraph(htmlid) {
+    document.getElementById(`${htmlid}-date-from`).value = then.toISOString().split("T")[0];
+    document.getElementById(`${htmlid}-date-to`).value = now.toISOString().split("T")[0];
+    document.getElementById(`${htmlid}-change-btn`).addEventListener("click", function() {
+        plotGraph(this.id.replace("-change-btn", ""));
+    });
+    plotGraph(htmlid);
+    document.querySelector(`#${htmlid}-data-toggle a`).addEventListener("click", function(evt) {
+        evt.stopPropagation();
+        evt.preventDefault();
+        const tableEl = document.getElementById(this.parentNode.id.replace("-data-toggle", "-table"));
+        tableEl.style.display = tableEl.style.display === "none" ? "" : "none";
+    });
+    window.addEventListener("orientationchange", () => plotGraph(htmlid));
+    if (screen && screen.orientation && screen.orientation.addEventListener) {
+        screen.orientation.addEventListener("change", () => plotGraph(htmlid));
+    }
+}
+
 function plotGraph(htmlid) {
     if (document.readyState === "loading") {
         addEventListener('DOMContentLoaded', () => _plotGraph(htmlid));
@@ -208,7 +227,7 @@ function _plotGraph(htmlid) {
         const lastValue = data.length ? data[data.length - 1] : null;
         if (lastValue) {
             const formattedValue = Math.round(lastValue.value * 10) / 10;
-            const formattedDate = new Intl.DateTimeFormat(undefined, {dateStyle: 'medium', timeStyle: 'short'}).format(lastValue.measured_at);
+            const formattedDate = new Intl.DateTimeFormat(undefined, {day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short'}).format(lastValue.measured_at);
             statusEl.innerHTML = `<span style="font-size: 1.2em; font-weight: bold;"><span>Latest flow rate is ${formattedValue} m3/sec</span><span style="padding-left: 5px; color: #999;">measured at ${formattedDate}</span></span>`;
             graphEl.prepend(statusEl);
         }

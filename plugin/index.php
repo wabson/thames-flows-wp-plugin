@@ -16,7 +16,7 @@ function markup($id, $stationName) {
        '<p id="'.$id.'-data-toggle"><a href="#">Show Data</a></p>'.
        '<p id="'.$id.'-table" class="table" style="display: none;"></p>'.
        '</div>'.
-       '<script type="text/javascript">document.getElementById("'.$id.'-date-from").value = then.toISOString().split("T")[0]; document.getElementById("'.$id.'-date-to").value = now.toISOString().split("T")[0]; document.getElementById("'.$id.'-change-btn").addEventListener("click", function() { plotGraph(this.id.replace("-change-btn", ""))}); plotGraph("'.$id.'"); document.querySelector("#'.$id.'-data-toggle a").addEventListener("click", function(evt) { evt.stopPropagation(); evt.preventDefault(); var tableEl = document.getElementById(this.parentNode.id.replace("-data-toggle", "-table")); tableEl.style.display = tableEl.style.display === "none" ? "" : "none"; }); window.addEventListener("orientationchange", function() { plotGraph("'.$id.'"); }); if (screen && screen.orientation && screen.orientation.addEventListener) { screen.orientation.addEventListener("change", function(e) { plotGraph("'.$id.'"); });}</script>';
+       '<script type="text/javascript">initGraph("'.$id.'");</script>';
 }
 
 // [flow_graph station_name="Kingston"]

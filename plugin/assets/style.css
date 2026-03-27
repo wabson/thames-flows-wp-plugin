@@ -76,14 +76,6 @@ body {
    font-family: Helvetica, Arial, sans-serif;
    font-size: 80%;
 }
-.ui-widget {
-   font-family: Helvetica, Arial, sans-serif;
-}
-.flow-graph input[type="text"] {
-   display: inline;
-   margin-bottom: 0px;
-   width: 100px;
-}
 .flow-graph table {
     border-collapse: collapse;
 }
@@ -97,14 +89,20 @@ body {
 /*.graph table {
     display: none;
 }*/
+.graph-controls button,
+.graph-controls input[type="date"] {
+   vertical-align: middle;
+   box-sizing: border-box;
+}
 .graph-controls button {
    font-family: Helvetica, Arial, sans-serif;
-   padding: 8px;
-   border-radius: 0;
-   border-bottom: 2px solid #e0e0e0;
-   border-right: 2px solid #e0e0e0;
+   padding: 3px 12px;
+   background: #fff;
+   color: #333;
+   border: 1px solid #767676;
+   border-radius: 3px;
+   cursor: pointer;
 }
-.graph-controls input[type="text"] {
-   padding: 5px;
-   color: #55555;
+.graph-controls button:hover {
+   background: #f0f0f0;
 }
