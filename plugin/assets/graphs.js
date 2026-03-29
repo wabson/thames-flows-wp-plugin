@@ -7,7 +7,7 @@ const numDays = 7;
 const margin = {top: 30, right: 20, bottom: 30, left: 40};
 const spaceAboveRatio = 0.1;
 
-const dateFormat = d3.time.format("%d %b %y %H:%M");
+const dateFormat = d3.timeFormat("%d %b %y %H:%M");
 
 const day = 24*60*60*1000, rangePeriod = day * numDays, now = new Date(Date.now()), then = new Date(now.getTime() - rangePeriod);
 
@@ -44,38 +44,48 @@ function _plotGraph(htmlid) {
     const width = svgWidth - margin.left - margin.right,
         height = svgHeight - margin.top - margin.bottom;
     then.setHours(0, 0, 0, 0);
-    //now.setHours(0, 0, 0, 0);
-    const x = d3.time.scale().nice()
+
+    const x = d3.scaleTime()
         .domain([then, now])
         .rangeRound([0, width]);
 
-    const y = d3.scale.linear()
+    const y = d3.scaleLinear()
         .rangeRound([height, 0]);
-    const ydata = d3.scale.linear()
+
+    const ydata = d3.scaleLinear()
         .range([Math.round(height * (1 - spaceAboveRatio)), 0]);
 
-    const xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom");
+    const xAxis = d3.axisBottom(x);
+    const yAxis = d3.axisLeft(y).ticks(10);
 
-    const yAxis = d3.svg.axis()
-        .scale(y)
-        .orient("left")
-        .ticks(10, "");
-
-    const line = d3.svg.line()
+    const line = d3.line()
         .x(d => x(d.measured_at))
         .y(d => y(d.value));
 
-    const area = d3.svg.area()
+    const area = d3.area()
         .x(d => x(d.measured_at))
         .y0(height)
         .y1(d => y(d.value));
 
-    const tip = d3.tip()
-       .attr('class', 'd3-tip')
-       .offset([-10, 0])
-       .html(d => `<strong>${dateFormat(d.measured_at)}</strong><br />${d.value.toPrecision(3)} m<sup>3</sup>/s`);
+    // Singleton tooltip shared across all graphs on the page
+    let tooltipEl = document.getElementById('flow-graph-tooltip');
+    if (!tooltipEl) {
+        tooltipEl = document.createElement('div');
+        tooltipEl.id = 'flow-graph-tooltip';
+        tooltipEl.className = 'd3-tip';
+        document.body.appendChild(tooltipEl);
+    }
+    const showTip = (event, d) => {
+        tooltipEl.innerHTML = `<strong>${dateFormat(d.measured_at)}</strong><br />${d.value.toPrecision(3)} m<sup>3</sup>/s`;
+        tooltipEl.style.opacity = '1';
+        tooltipEl.style.left = (event.pageX + 10) + 'px';
+        tooltipEl.style.top = (event.pageY - 40) + 'px';
+    };
+    const moveTip = (event) => {
+        tooltipEl.style.left = (event.pageX + 10) + 'px';
+        tooltipEl.style.top = (event.pageY - 40) + 'px';
+    };
+    const hideTip = () => { tooltipEl.style.opacity = '0'; };
 
     d3.select(`#${htmlid}-graph`).html("");
     const svg = d3.select(`#${htmlid}-graph`).append("svg")
@@ -87,10 +97,8 @@ function _plotGraph(htmlid) {
     d3.select(`#${htmlid}-table`).html("");
     const table = d3.select(`#${htmlid}-table`).append("table").html("<tr><th>Time</th><th>Flow Rate (m<sup>3</sup>/s)</th></tr>");
 
-    svg.call(tip);
-
-    const parseDateTime = d3.time.format.utc("%Y-%m-%d %H:%M:%S").parse,
-        toDate = d => d3.time.format.utc("%Y-%m-%d").parse(d3.time.format.utc("%Y-%m-%d")(d));
+    const parseDateTime = d3.utcParse("%Y-%m-%d %H:%M:%S"),
+        toDate = d => d3.utcParse("%Y-%m-%d")(d3.utcFormat("%Y-%m-%d")(d));
 
     const startDateVal = document.getElementById(`${htmlid}-date-from`).value;
     const endDateVal = document.getElementById(`${htmlid}-date-to`).value;
@@ -101,12 +109,10 @@ function _plotGraph(htmlid) {
     if (startDate !== null && endDate !== null) {
         // Add a day to the end date so that we get that day's data too
         endDate.setTime(endDate.getTime() + 24*60*60*1000);
-        apiUrl += `&start=${d3.time.format("%Y-%m-%d")(startDate)}&end=${d3.time.format("%Y-%m-%d")(endDate)}`;
+        apiUrl += `&start=${d3.timeFormat("%Y-%m-%d")(startDate)}&end=${d3.timeFormat("%Y-%m-%d")(endDate)}`;
     }
 
-    d3.json(apiUrl, (error, json) => {
-        if (error) return console.warn(error);
-
+    d3.json(apiUrl).then(json => {
         let data;
         if (json) {
             data = json.data;
@@ -116,7 +122,6 @@ function _plotGraph(htmlid) {
                 d.measured_at = parseDateTime(d.measured_at);
             });
             data.sort((d1, d2) => d1.measured_at.getTime() < d2.measured_at.getTime() ? -1 : 1);
-            //data = data.filter(uniqueTimes);
         }
 
         // WA var xtent = d3.extent(data, function(d) { return toDate(d.measured_at); }),
@@ -126,8 +131,8 @@ function _plotGraph(htmlid) {
             graphWidth = numCols * barWidth,
             barPadding = Math.floor(barWidth * 0.2);
         x.domain(xtent);
-        const days = d3.time.days(xtent[0], xtent[1]);
-        const saturdays = d3.time.saturdays(xtent[0], xtent[1]), mondays = d3.time.mondays(xtent[0], xtent[1]);
+        const days = d3.timeDays(xtent[0], xtent[1]);
+        const saturdays = d3.timeSaturdays(xtent[0], xtent[1]), mondays = d3.timeMondays(xtent[0], xtent[1]);
         const weekends = [];
         if (saturdays.length > 0 && mondays.length > 0) {
             if (saturdays[0] > mondays[0]) { // Is the start of the graph already in a weekend?
@@ -167,17 +172,16 @@ function _plotGraph(htmlid) {
 
         svg.selectAll(".days")
             .data(days)
-            .enter().append("svg:line")
+            .enter().append("line")
             .attr("class", "weekday")
             .attr("x1", d => x(d))
             .attr("x2", d => x(d))
             .attr("y1", 0)
-            .attr("y2", height)
-            .attr("transform", "translate(0,0)");
+            .attr("y2", height);
 
         svg.selectAll(".rule")
             .data(y.ticks(10))
-            .enter().append("svg:line")
+            .enter().append("line")
             .attr("class", "rule")
             .attr("x1", 1)
             .attr("y1", d => y(d))
@@ -193,8 +197,9 @@ function _plotGraph(htmlid) {
             .attr("y", d => y(d.value))
             .attr("height", d => height - y(d.value))
             .attr("transform", `translate(${barPadding},0)`)
-            .on('mouseover', tip.show)
-            .on('mouseout', tip.hide)
+            .on('mouseover', showTip)
+            .on('mousemove', moveTip)
+            .on('mouseout', hideTip);
 
         svg.append("path")
             .datum(data)
@@ -213,9 +218,10 @@ function _plotGraph(htmlid) {
             .attr("r", 3.5)
             .attr("cx", d => x(d.measured_at))
             .attr("cy", d => y(d.value))
-            .on('mouseover', tip.show)
-            .on('mouseout', tip.hide)
-            .on('click', (d, i) => console.log(d, i));
+            .on('mouseover', showTip)
+            .on('mousemove', moveTip)
+            .on('mouseout', hideTip)
+            .on('click', (event, d) => console.log(d));
 
         table.selectAll(".row")
             .data(data)
@@ -231,5 +237,5 @@ function _plotGraph(htmlid) {
             statusEl.innerHTML = `<span style="font-size: 1.2em; font-weight: bold;"><span>Latest flow rate is ${formattedValue} m3/sec</span><span style="padding-left: 5px; color: #999;">measured at ${formattedDate}</span></span>`;
             graphEl.prepend(statusEl);
         }
-    });
+    }).catch(error => console.warn(error));
 }

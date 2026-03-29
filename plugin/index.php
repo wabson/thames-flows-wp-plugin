@@ -19,18 +19,23 @@ function markup($id, $stationName) {
        '<script type="text/javascript">initGraph("'.$id.'");</script>';
 }
 
-// [flow_graph station_name="Kingston"]
+// [flow_graph id="kingston" station_name="Kingston Flow"]
 function flow_graph( $atts ) {
     extract( shortcode_atts( array(
-        'station_name' => 'Kingston',
+        'id' => '',
+        'station_name' => '',
     ), $atts ) );
-    $id = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $station_name));
+    if ( !$station_name ) {
+        $station_name = $id ?: 'Kingston';
+    }
+    if ( !$id ) {
+        $id = $station_name;
+    }
+    $id = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $id));
 
-    $html = '<script src="//d3js.org/d3.v3.min.js"></script>'.
-        '<script src="'.plugin_dir_url(__FILE__).'assets/d3-tip-0.9.1.js"></script>'.
-
+    $html = '<script src="//d3js.org/d3.v7.min.js"></script>'.
         '<link rel="stylesheet" href="'.plugin_dir_url(__FILE__).'assets/style.css?v=2">'.
-        '<script src="'.plugin_dir_url(__FILE__).'assets/graphs.js?v=4"></script>'.
+        '<script src="'.plugin_dir_url(__FILE__).'assets/graphs.js?v=5"></script>'.
         '<div class="graphs">'.
         markup($id, $station_name).
         '</div>';
